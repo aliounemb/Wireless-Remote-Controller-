@@ -18,46 +18,45 @@
 
 #define VERTICAL 0
 #define HORIZONTAL 1
-#define CBUTTON 2
-#define ZBUTTON 3
+#define ZBUTTON 2
 
-short cButtonPin = A5;
-short zButtonPin = A4;
+//short zButtonPin = A4;
 
-short analogVerticalPin = A3;
-short analogHorizontalPin = A2;
+short analogVerticalPin = A2;
+short analogHorizontalPin = A3;
 
-short ledPin = 6;
+
 
 short RF24cePin = 9;
 short RF24csnPin = 10;
 
-int msg[4];
+int msg[3]; //4
 RF24 radio(RF24cePin, RF24csnPin);
 const uint64_t pipe = 0xE8E8F0F0E1LL;
+
 
 void setup() {
   radio.begin();
   radio.openWritingPipe(pipe);
 
-  pinMode(ledPin, OUTPUT);
-  pinMode(cButtonPin, INPUT_PULLUP);
-  pinMode(zButtonPin, INPUT_PULLUP);
+
+ // pinMode(zButtonPin, INPUT_PULLUP);
   pinMode(analogVerticalPin, INPUT);
   pinMode(analogHorizontalPin, INPUT);
   
-  digitalWrite(ledPin, HIGH);
+
+  Serial.begin(9600);
 }
+
+
 
 void loop() {
   delay(DELAY);
   
   msg[VERTICAL] = map(analogRead(analogVerticalPin), ANALOGMINVERTICAL, ANALOGMAXVERTICAL, VERTICALMIN, VERTICALMAX);
   msg[HORIZONTAL] = map(analogRead(analogHorizontalPin), ANALOGMINHORIZONTAL, ANALOGMAXHORIZONTAL, HORIZONTALMIN, HORIZONTALMAX);
-  if (digitalRead(cButtonPin)) { msg[CBUTTON] = 1;
-  } else { msg[CBUTTON] = 0;}
-  if (digitalRead(zButtonPin)) { msg[ZBUTTON] = 1;
-  } else { msg[ZBUTTON] = 0;}
-  
-  radio.write(msg,8);
+
+  msg[ZBUTTON] = 1;
+  radio.write(msg,sizeof(8));
+
 }
